@@ -19,20 +19,20 @@
 
   <!-- NAVEGACIÓN SUPERIOR CON DEGRADADO ELEGANTE -->
   <nav class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl sticky top-0 z-10 border-b border-indigo-500/20">
-    <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
-      <div class="flex items-center gap-2.5">
-        <div class="p-2 bg-indigo-500/20 rounded-xl border border-indigo-400/30">
-          <i data-lucide="wallet" class="w-5 h-5 text-indigo-400"></i>
+    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <div class="p-1.5 bg-indigo-500/20 rounded-xl border border-indigo-400/30">
+          <i data-lucide="wallet" class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-400"></i>
         </div>
         <div>
-          <h1 class="text-lg font-bold tracking-tight hidden sm:block text-slate-100">Mi Control de Gastos</h1>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight text-slate-100">Mi Control de Gastos</h1>
           <p class="text-[10px] text-indigo-300/80 hidden sm:block font-medium" id="estado-conexion">🟢 Conectado a la nube</p>
         </div>
       </div>
       
       <!-- Selector de Mes y Año unificados -->
-      <div class="flex items-center gap-1.5 bg-slate-800/80 hover:bg-slate-800 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 transition shadow-inner">
-        <i data-lucide="calendar" class="w-4 h-4 text-indigo-400"></i>
+      <div class="flex items-center gap-1 bg-slate-800/80 hover:bg-slate-800 backdrop-blur-md px-2.5 py-1 rounded-xl border border-slate-700 transition shadow-inner">
+        <i data-lucide="calendar" class="w-3.5 h-3.5 text-indigo-400"></i>
         <select id="filtro-mes" onchange="actualizarInterfaz()" class="bg-transparent text-white text-xs sm:text-sm font-semibold outline-none cursor-pointer py-0.5">
           <option value="01" class="bg-slate-900 text-white">Enero</option>
           <option value="02" class="bg-slate-900 text-white">Febrero</option>
@@ -54,98 +54,91 @@
     </div>
   </nav>
 
-  <main class="max-w-5xl mx-auto px-4 mt-6 space-y-6">
+  <main class="max-w-5xl mx-auto px-3 sm:px-4 mt-4 space-y-4">
 
-    <!-- RESUMEN DE SALDOS (Tarjetas principales) -->
-    <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <!-- Disponible Real -->
-      <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-200/60 flex flex-col justify-between transition hover:shadow-xl hover:-translate-y-0.5">
-        <div class="flex justify-between items-start">
-          <span class="text-[11px] font-bold uppercase text-slate-400 tracking-wider">Disponible Real</span>
-          <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
-            <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+    <!-- RESUMEN DE SALDOS -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
+      <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-md border border-slate-200/60 flex flex-col justify-between transition hover:shadow-lg">
+        <div class="flex justify-between items-center">
+          <span class="text-[9px] sm:text-[11px] font-bold uppercase text-slate-400 tracking-wider">Disponible Real</span>
+          <div class="p-1.5 sm:p-2 bg-emerald-50 text-emerald-600 rounded-lg sm:rounded-xl">
+            <i data-lucide="dollar-sign" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
           </div>
         </div>
-        <div class="mt-4">
-          <p class="text-2xl font-black text-slate-900 tracking-tight" id="lbl-disponible">$0,00</p>
-          <p class="text-[11px] font-medium text-slate-400 mt-1">Ingresos - Gastos Inmediatos</p>
+        <div class="mt-2">
+          <p class="text-base sm:text-2xl font-black text-slate-900 tracking-tight" id="lbl-disponible">$0,00</p>
+          <p class="text-[9px] sm:text-[11px] font-medium text-slate-400 mt-0.5 truncate">Ingresos - Inmediatos</p>
         </div>
       </div>
 
-      <!-- Total Ingresos -->
-      <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-200/60 flex flex-col justify-between transition hover:shadow-xl hover:-translate-y-0.5">
-        <div class="flex justify-between items-start">
-          <span class="text-[11px] font-bold uppercase text-slate-400 tracking-wider">Ingresos del Mes</span>
-          <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
-            <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
+      <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-md border border-slate-200/60 flex flex-col justify-between transition hover:shadow-lg">
+        <div class="flex justify-between items-center">
+          <span class="text-[9px] sm:text-[11px] font-bold uppercase text-slate-400 tracking-wider">Ingresos Mes</span>
+          <div class="p-1.5 sm:p-2 bg-blue-50 text-blue-600 rounded-lg sm:rounded-xl">
+            <i data-lucide="arrow-down-left" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
           </div>
         </div>
-        <div class="mt-4">
-          <p class="text-2xl font-black text-slate-900 tracking-tight" id="lbl-ingresos">$0,00</p>
-          <p class="text-[11px] font-medium text-slate-400 mt-1">Fijos + Extra</p>
+        <div class="mt-2">
+          <p class="text-base sm:text-2xl font-black text-slate-900 tracking-tight" id="lbl-ingresos">$0,00</p>
+          <p class="text-[9px] sm:text-[11px] font-medium text-slate-400 mt-0.5 truncate">Fijos + Extra</p>
         </div>
       </div>
 
-      <!-- Pendiente por Pagar / Cuotas -->
-      <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-200/60 flex flex-col justify-between transition hover:shadow-xl hover:-translate-y-0.5">
-        <div class="flex justify-between items-start">
-          <span class="text-[11px] font-bold uppercase text-slate-400 tracking-wider">Tarjetas / Cuotas</span>
-          <div class="p-2.5 bg-amber-50 text-amber-600 rounded-xl">
-            <i data-lucide="credit-card" class="w-5 h-5"></i>
+      <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-md border border-slate-200/60 flex flex-col justify-between transition hover:shadow-lg">
+        <div class="flex justify-between items-center">
+          <span class="text-[9px] sm:text-[11px] font-bold uppercase text-slate-400 tracking-wider">Tarjetas / Cuotas</span>
+          <div class="p-1.5 sm:p-2 bg-amber-50 text-amber-600 rounded-lg sm:rounded-xl">
+            <i data-lucide="credit-card" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
           </div>
         </div>
-        <div class="mt-4">
-          <p class="text-2xl font-black text-amber-600 tracking-tight" id="lbl-pendientes">$0,00</p>
-          <p class="text-[11px] font-medium text-slate-400 mt-1">Resumen a pagar este mes</p>
+        <div class="mt-2">
+          <p class="text-base sm:text-2xl font-black text-amber-600 tracking-tight" id="lbl-pendientes">$0,00</p>
+          <p class="text-[9px] sm:text-[11px] font-medium text-slate-400 mt-0.5 truncate">Resumen del mes</p>
         </div>
       </div>
 
-      <!-- Total Invertido -->
-      <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-200/60 flex flex-col justify-between transition hover:shadow-xl hover:-translate-y-0.5">
-        <div class="flex justify-between items-start">
-          <span class="text-[11px] font-bold uppercase text-slate-400 tracking-wider">Total Invertido</span>
-          <div class="p-2.5 bg-purple-50 text-purple-600 rounded-xl">
-            <i data-lucide="trending-up" class="w-5 h-5"></i>
+      <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-md border border-slate-200/60 flex flex-col justify-between transition hover:shadow-lg">
+        <div class="flex justify-between items-center">
+          <span class="text-[9px] sm:text-[11px] font-bold uppercase text-slate-400 tracking-wider">Total Invertido</span>
+          <div class="p-1.5 sm:p-2 bg-purple-50 text-purple-600 rounded-lg sm:rounded-xl">
+            <i data-lucide="trending-up" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
           </div>
         </div>
-        <div class="mt-4">
-          <p class="text-2xl font-black text-purple-700 tracking-tight" id="lbl-total-invertido">$0,00</p>
-          <p class="text-[11px] font-medium text-purple-600/80 mt-1" id="lbl-rendimiento-estimado">+$0,00 rendimientos</p>
+        <div class="mt-2">
+          <p class="text-base sm:text-2xl font-black text-purple-700 tracking-tight" id="lbl-total-invertido">$0,00</p>
+          <p class="text-[9px] sm:text-[11px] font-medium text-purple-600/80 mt-0.5 truncate" id="lbl-rendimiento-estimado">+$0,00 rend.</p>
         </div>
       </div>
     </section>
 
     <!-- BOTONES DE ACCIÓN RÁPIDA -->
-    <section class="grid grid-cols-2 gap-4">
-      <button onclick="abrirModalGasto()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transition active:scale-98">
-        <i data-lucide="minus-circle" class="w-5 h-5"></i>
+    <section class="grid grid-cols-2 gap-3">
+      <button onclick="abrirModalGasto()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-3 rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg flex items-center justify-center gap-1.5 transition active:scale-98 text-xs sm:text-sm">
+        <i data-lucide="minus-circle" class="w-4 h-4"></i>
         <span>Registrar Gasto</span>
       </button>
-      <button onclick="abrirModalIngreso()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transition active:scale-98">
-        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+      <button onclick="abrirModalIngreso()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-3 rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg flex items-center justify-center gap-1.5 transition active:scale-98 text-xs sm:text-sm">
+        <i data-lucide="plus-circle" class="w-4 h-4"></i>
         <span>Registrar Ingreso</span>
       </button>
     </section>
 
-    <!-- GASTOS Y DISPONIBLE POR CATEGORÍA (GRÁFICO DE TORTA) -->
-    <section class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200/60">
-      <h2 class="text-base font-bold text-slate-800 mb-5 flex items-center gap-2">
-        <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-600"></i>
-        Distribución de Ingresos y Gastos (Mes Seleccionado)
+    <!-- GASTOS Y DISPONIBLE POR CATEGORÍA -->
+    <section class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border border-slate-200/60">
+      <h2 class="text-sm sm:text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <i data-lucide="pie-chart" class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600"></i>
+        Distribución de Ingresos y Gastos
       </h2>
       
-      <div id="contenedor-grafico-vacio" class="text-center py-10 text-slate-400 text-sm italic hidden">
+      <div id="contenedor-grafico-vacio" class="text-center py-8 text-slate-400 text-xs sm:text-sm italic hidden">
         No hay ingresos ni gastos registrados en este mes para mostrar el gráfico.
       </div>
 
-      <div id="contenedor-grafico" class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        <!-- Lienzo del Gráfico -->
-        <div class="relative max-w-[250px] mx-auto w-full aspect-square">
+      <div id="contenedor-grafico" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+        <div class="relative max-w-[210px] sm:max-w-[250px] mx-auto w-full aspect-square">
           <canvas id="chartCategorias"></canvas>
         </div>
-
-        <!-- Leyenda Personalizada -->
-        <div id="leyenda-categorias" class="space-y-2">
+        <div id="leyenda-categorias" class="space-y-1.5">
           <!-- Se genera dinámicamente -->
         </div>
       </div>
@@ -153,16 +146,15 @@
 
     <!-- PLANILLA DE MOVIMIENTOS COMPLETA -->
     <section class="bg-white rounded-2xl shadow-lg border border-slate-200/60 overflow-hidden">
-      <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50/50">
-        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
-          <i data-lucide="list" class="w-5 h-5 text-indigo-600"></i>
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 bg-slate-50/50">
+        <h2 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+          <i data-lucide="list" class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600"></i>
           Planilla de Movimientos
         </h2>
         
-        <!-- Selector de Criterio de Ordenamiento -->
         <div class="flex items-center gap-2 text-xs text-slate-500">
           <span class="font-medium">Ordenar por:</span>
-          <select id="criterio-orden" onchange="actualizarInterfaz()" class="bg-white text-slate-700 font-semibold px-3 py-1.5 rounded-xl border border-slate-200 outline-none cursor-pointer shadow-xs">
+          <select id="criterio-orden" onchange="actualizarInterfaz()" class="bg-white text-slate-700 font-semibold px-2.5 py-1 rounded-xl border border-slate-200 outline-none cursor-pointer shadow-xs text-xs">
             <option value="prioridad">Por Tipo / Categoría</option>
             <option value="fecha-desc">Fecha (Más reciente primero)</option>
             <option value="fecha-asc">Fecha (Más antigua primero)</option>
@@ -171,15 +163,16 @@
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-600">
+        <table class="w-full text-left text-xs sm:text-sm text-slate-600">
           <thead class="bg-slate-50 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-100">
             <tr>
-              <th class="py-3.5 px-4">Fecha</th>
-              <th class="py-3.5 px-4">Detalle / Concepto</th>
-              <th class="py-3.5 px-4">Categoría</th>
-              <th class="py-3.5 px-4">Medio / Tipo</th>
-              <th class="py-3.5 px-4 text-right">Monto</th>
-              <th class="py-3.5 px-4 text-center">Acciones</th>
+              <th class="py-3 px-3 sm:px-4 text-center">Estado / Pago</th>
+              <th class="py-3 px-3 sm:px-4">Fecha Compra</th>
+              <th class="py-3 px-3 sm:px-4">Detalle / Concepto</th>
+              <th class="py-3 px-3 sm:px-4">Categoría</th>
+              <th class="py-3 px-3 sm:px-4">Medio / Tipo</th>
+              <th class="py-3 px-3 sm:px-4 text-right">Monto</th>
+              <th class="py-3 px-3 sm:px-4 text-center">Acciones</th>
             </tr>
           </thead>
           <tbody id="tabla-movimientos" class="divide-y divide-slate-100">
@@ -190,22 +183,22 @@
     </section>
 
     <!-- SECCIÓN: INVERSIONES Y AHORROS -->
-    <section class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200/60 space-y-4">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+    <section class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border border-slate-200/60 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
         <div>
-          <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
-            <i data-lucide="piggy-bank" class="w-5 h-5 text-purple-600"></i>
+          <h2 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <i data-lucide="piggy-bank" class="w-4 h-4 sm:w-5 sm:h-5 text-purple-600"></i>
             Ahorros e Inversiones
           </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Control de cuentas remuneradas y plazos fijos</p>
+          <p class="text-[11px] text-slate-400 mt-0.5">Cuentas remuneradas y plazos fijos</p>
         </div>
-        <button onclick="abrirModalInversion()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2.5 px-3.5 rounded-xl shadow-md hover:shadow-lg flex items-center gap-1.5 transition">
-          <i data-lucide="plus" class="w-4 h-4"></i>
+        <button onclick="abrirModalInversion()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2 px-3 rounded-xl shadow-md hover:shadow-lg flex items-center gap-1 transition">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
           <span>Nueva Inversión</span>
         </button>
       </div>
 
-      <div id="contenedor-inversiones" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div id="contenedor-inversiones" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         <!-- Tarjetas dinámicas de inversiones -->
       </div>
     </section>
@@ -214,13 +207,13 @@
 
   <!-- MODAL: REGISTRAR GASTO -->
   <div id="modal-gasto" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100">
       <div class="flex justify-between items-center border-b pb-3">
         <h3 class="text-base font-bold text-slate-800">Registrar Nuevo Gasto</h3>
         <button onclick="cerrarModal('modal-gasto')" class="text-slate-400 hover:text-slate-600 p-1">&times;</button>
       </div>
 
-      <form id="form-gasto" onsubmit="guardarGasto(event)" class="space-y-4">
+      <form id="form-gasto" onsubmit="guardarGasto(event)" class="space-y-3.5">
         <div>
           <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Monto ($)</label>
           <input type="number" step="0.01" id="gasto-monto" required placeholder="0.00" class="w-full border border-slate-200 rounded-xl p-3 text-lg font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none">
@@ -228,13 +221,13 @@
 
         <div>
           <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Detalle / Concepto</label>
-          <input type="text" id="gasto-detalle" required placeholder="Ej. Luz, Club, Netflix, Nafta" class="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500">
+          <input type="text" id="gasto-detalle" required placeholder="Ej. Luz, Club, Netflix, Nafta" class="w-full border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Categoría</label>
-            <select id="gasto-categoria" class="w-full border border-slate-200 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-indigo-500">
+            <select id="gasto-categoria" class="w-full border border-slate-200 rounded-xl p-3 text-xs sm:text-sm bg-white outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="Impuestos y Servicios">Impuestos y Servicios</option>
               <option value="Supermercado/Comida">Supermercado/Comida</option>
               <option value="Transporte/Auto">Transporte/Auto</option>
@@ -247,7 +240,7 @@
 
           <div>
             <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Medio de Pago</label>
-            <select id="gasto-medio" onchange="evaluarMedioPago()" class="w-full border border-slate-200 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-indigo-500">
+            <select id="gasto-medio" onchange="evaluarMedioPago()" class="w-full border border-slate-200 rounded-xl p-3 text-xs sm:text-sm bg-white outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="Inmediato">Efectivo / Débito (Inmediato)</option>
               <option value="Diferido">Tarjeta de Crédito (Cuotas)</option>
             </select>
@@ -264,7 +257,7 @@
         <div id="campo-cuotas" class="hidden space-y-3 p-3 bg-amber-50/70 border border-amber-200 rounded-xl">
           <div>
             <label class="block text-xs font-semibold text-amber-900 uppercase mb-1">Cantidad de Cuotas</label>
-            <select id="gasto-cuotas" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-amber-500">
+            <select id="gasto-cuotas" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-amber-500 text-xs sm:text-sm">
               <option value="1">1 cuota</option>
               <option value="2">2 cuotas</option>
               <option value="3">3 cuotas</option>
@@ -285,7 +278,7 @@
 
           <div>
             <label class="block text-xs font-semibold text-amber-900 uppercase mb-1">¿Cuándo se paga la 1.ª cuota?</label>
-            <select id="gasto-inicio-cuota" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-amber-500">
+            <select id="gasto-inicio-cuota" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-xs sm:text-sm text-slate-800 outline-none focus:ring-2 focus:ring-amber-500">
               <option value="0">Este mes (Mes actual)</option>
               <option value="1" selected>El próximo mes (+1 mes)</option>
               <option value="2">En 2 meses (+2 meses)</option>
@@ -294,8 +287,8 @@
         </div>
 
         <div class="flex gap-3 pt-2">
-          <button type="button" onclick="cerrarModal('modal-gasto')" class="w-1/2 py-3 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Cancelar</button>
-          <button type="submit" class="w-1/2 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 font-bold text-white shadow-sm">Guardar Gasto</button>
+          <button type="button" onclick="cerrarModal('modal-gasto')" class="w-1/2 py-3 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 text-xs sm:text-sm">Cancelar</button>
+          <button type="submit" class="w-1/2 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 font-bold text-white shadow-sm text-xs sm:text-sm">Guardar Gasto</button>
         </div>
       </form>
     </div>
@@ -303,13 +296,13 @@
 
   <!-- MODAL: REGISTRAR INGRESO -->
   <div id="modal-ingreso" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 border border-slate-100">
       <div class="flex justify-between items-center border-b pb-3">
         <h3 class="text-base font-bold text-slate-800">Registrar Ingreso</h3>
         <button onclick="cerrarModal('modal-ingreso')" class="text-slate-400 hover:text-slate-600 p-1">&times;</button>
       </div>
 
-      <form id="form-ingreso" onsubmit="guardarIngreso(event)" class="space-y-4">
+      <form id="form-ingreso" onsubmit="guardarIngreso(event)" class="space-y-3.5">
         <div>
           <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Monto ($)</label>
           <input type="number" step="0.01" id="ingreso-monto" required placeholder="0.00" class="w-full border border-slate-200 rounded-xl p-3 text-lg font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none">
@@ -317,12 +310,12 @@
 
         <div>
           <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Detalle / Origen</label>
-          <input type="text" id="ingreso-detalle" required placeholder="Ej. Sueldo, Trabajo Extra, Venta" class="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500">
+          <input type="text" id="ingreso-detalle" required placeholder="Ej. Sueldo, Trabajo Extra, Venta" class="w-full border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
 
         <div class="flex gap-3 pt-2">
-          <button type="button" onclick="cerrarModal('modal-ingreso')" class="w-1/2 py-3 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Cancelar</button>
-          <button type="submit" class="w-1/2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-white shadow-sm">Guardar Ingreso</button>
+          <button type="button" onclick="cerrarModal('modal-ingreso')" class="w-1/2 py-3 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 text-xs sm:text-sm">Cancelar</button>
+          <button type="submit" class="w-1/2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-white shadow-sm text-xs sm:text-sm">Guardar Ingreso</button>
         </div>
       </form>
     </div>
@@ -330,7 +323,7 @@
 
   <!-- MODAL: EDITAR MONTO -->
   <div id="modal-editar" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 sm:p-6 shadow-2xl space-y-4 border border-slate-100">
       <div class="flex justify-between items-center border-b pb-3">
         <h3 class="text-base font-bold text-slate-800">Editar Monto</h3>
         <button onclick="cerrarModal('modal-editar')" class="text-slate-400 hover:text-slate-600 p-1">&times;</button>
@@ -348,8 +341,8 @@
         </p>
 
         <div class="flex gap-3 pt-2">
-          <button type="button" onclick="cerrarModal('modal-editar')" class="w-1/2 py-2.5 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Cancelar</button>
-          <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 font-bold text-white shadow-sm">Guardar</button>
+          <button type="button" onclick="cerrarModal('modal-editar')" class="w-1/2 py-2.5 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 text-xs sm:text-sm">Cancelar</button>
+          <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 font-bold text-white shadow-sm text-xs sm:text-sm">Guardar</button>
         </div>
       </form>
     </div>
@@ -357,22 +350,22 @@
 
   <!-- MODAL: NUEVA INVERSIÓN / AHORRO -->
   <div id="modal-inversion" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 border border-slate-100">
       <div class="flex justify-between items-center border-b pb-3">
         <h3 class="text-base font-bold text-slate-800">Nueva Inversión / Ahorro</h3>
         <button onclick="cerrarModal('modal-inversion')" class="text-slate-400 hover:text-slate-600 p-1">&times;</button>
       </div>
 
-      <form id="form-inversion" onsubmit="guardarInversion(event)" class="space-y-4">
+      <form id="form-inversion" onsubmit="guardarInversion(event)" class="space-y-3.5">
         <div>
           <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombre / Entidad</label>
-          <input type="text" id="inv-nombre" required placeholder="Ej. Mercado Pago, Plazo Fijo BNA, Ualá" class="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500">
+          <input type="text" id="inv-nombre" required placeholder="Ej. Mercado Pago, Plazo Fijo BNA, Ualá" class="w-full border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-purple-500">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tipo de Instrumento</label>
-            <select id="inv-tipo" onchange="evaluarTipoInversion()" class="w-full border border-slate-200 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-purple-500">
+            <select id="inv-tipo" onchange="evaluarTipoInversion()" class="w-full border border-slate-200 rounded-xl p-3 text-xs sm:text-sm bg-white outline-none focus:ring-2 focus:ring-purple-500">
               <option value="billetera">Billetera Virtual (Diario)</option>
               <option value="plazo_fijo">Plazo Fijo (Vencimiento)</option>
             </select>
@@ -380,32 +373,32 @@
 
           <div>
             <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Monto Inicial ($)</label>
-            <input type="number" step="0.01" id="inv-monto" required placeholder="0.00" class="w-full border border-slate-200 rounded-xl p-3 text-slate-800 font-bold focus:ring-2 focus:ring-purple-500 outline-none">
+            <input type="number" step="0.01" id="inv-monto" required placeholder="0.00" class="w-full border border-slate-200 rounded-xl p-3 text-slate-800 font-bold focus:ring-2 focus:ring-purple-500 outline-none text-sm">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tasa Anual (TNA %)</label>
-            <input type="number" step="0.1" id="inv-tna" required placeholder="Ej. 35" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-purple-500 outline-none">
+            <input type="number" step="0.1" id="inv-tna" required placeholder="Ej. 35" class="w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div id="campo-dias-pf" class="hidden">
             <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Plazo (Días)</label>
-            <input type="number" id="inv-dias" value="30" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-purple-500 outline-none">
+            <input type="number" id="inv-dias" value="30" class="w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
         </div>
 
         <div class="flex gap-3 pt-2">
-          <button type="button" onclick="cerrarModal('modal-inversion')" class="w-1/2 py-3 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Cancelar</button>
-          <button type="submit" class="w-1/2 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 font-bold text-white shadow-sm">Crear Inversión</button>
+          <button type="button" onclick="cerrarModal('modal-inversion')" class="w-1/2 py-3 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 text-xs sm:text-sm">Cancelar</button>
+          <button type="submit" class="w-1/2 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 font-bold text-white shadow-sm text-xs sm:text-sm">Crear Inversión</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    // Configuración de tu cuenta de Firebase
+    // Configuración de Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBaAz8p2S1IuUCqFOmZimyNq04lS7ybVtw",
       authDomain: "fer-plan-financiero.firebaseapp.com",
@@ -417,14 +410,19 @@
       measurementId: "G-6JC170LGZT"
     };
 
-    // Inicializar Firebase
     firebase.initializeApp(firebaseConfig);
     const dbRef = firebase.database().ref("appData");
 
-    // Inicializar íconos
     lucide.createIcons();
 
-    // Formatear moneda con separador de miles
+    function obtenerFechaHoyISO() {
+      const d = new Date();
+      const anio = d.getFullYear();
+      const mes = String(d.getMonth() + 1).padStart(2, '0');
+      const dia = String(d.getDate()).padStart(2, '0');
+      return `${anio}-${mes}-${dia}`;
+    }
+
     function formatearMoneda(valor) {
       return new Intl.NumberFormat('es-AR', {
         minimumFractionDigits: 2,
@@ -440,7 +438,6 @@
 
     let miGraficoTorta = null;
 
-    // Inicializar combos de Fecha (Mes y Año)
     const hoy = new Date();
     const anioActual = hoy.getFullYear();
     const mesActualNum = String(hoy.getMonth() + 1).padStart(2, '0');
@@ -456,12 +453,10 @@
     }
     document.getElementById('filtro-mes').value = mesActualNum;
 
-    // Variables globales
     let movimientos = [];
     let serviciosRecurrentes = [];
     let inversiones = [];
 
-    // ESCUCHAR CAMBIOS EN TIEMPO REAL DESDE FIREBASE
     dbRef.on('value', (snapshot) => {
       const data = snapshot.val() || {};
       movimientos = data.movimientos || [];
@@ -474,7 +469,6 @@
       document.getElementById('estado-conexion').textContent = '🔴 Sin conexión';
     });
 
-    // Guardar estado completo en Firebase
     function sincronizarConFirebase() {
       dbRef.set({
         movimientos: movimientos,
@@ -518,26 +512,22 @@
       let cambioRealizado = false;
       serviciosRecurrentes.forEach(servicio => {
         if (servicio.fechaInicio <= mesSeleccionado) {
-          const yaExiste = movimientos.some(m => m.servicioId === servicio.id && m.fecha.startsWith(mesSeleccionado));
+          const yaExiste = movimientos.some(m => m.servicioId === servicio.id && (m.periodoCobro === mesSeleccionado || (!m.periodoCobro && m.fecha.startsWith(mesSeleccionado))));
           const cancelado = servicio.fechaFin && servicio.fechaFin <= mesSeleccionado;
 
           if (!yaExiste && !cancelado) {
-            const movimientosPrevios = movimientos
-              .filter(m => m.servicioId === servicio.id && m.fecha < mesSeleccionado)
-              .sort((a, b) => b.fecha.localeCompare(a.fecha));
-
-            const montoActualizado = movimientosPrevios.length > 0 ? movimientosPrevios[0].monto : servicio.montoBase;
-
             movimientos.push({
               id: Date.now() + Math.floor(Math.random() * 1000),
               servicioId: servicio.id,
               tipo: 'gasto',
-              monto: montoActualizado,
+              monto: servicio.montoBase,
               detalle: servicio.detalle,
               categoria: servicio.categoria,
               medio: 'Inmediato',
               esRecurrente: true,
-              fecha: `${mesSeleccionado}-01`
+              pagado: false, // Impuesto o servicio nuevo arranca pendiente
+              fecha: `${mesSeleccionado}-01`,
+              periodoCobro: mesSeleccionado
             });
             cambioRealizado = true;
           }
@@ -564,9 +554,7 @@
       contenedorGrafico.classList.remove('hidden');
       contenedorVacio.classList.add('hidden');
 
-      if (miGraficoTorta) {
-        miGraficoTorta.destroy();
-      }
+      if (miGraficoTorta) miGraficoTorta.destroy();
 
       const etiquetas = [];
       const montos = [];
@@ -627,15 +615,23 @@
         const esDisponible = item === 'Disponible Real';
 
         leyenda.innerHTML += `
-          <div class="flex items-center justify-between text-xs p-2.5 rounded-xl ${esDisponible ? 'bg-emerald-50 border border-emerald-200/80 font-bold text-emerald-900' : 'bg-slate-50 border border-slate-100'}">
-            <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full" style="background-color: ${color}"></span>
-              <span class="font-medium ${esDisponible ? 'text-emerald-900 font-bold' : 'text-slate-700'}">${item}</span>
+          <div class="flex items-center justify-between text-xs p-2 rounded-xl ${esDisponible ? 'bg-emerald-50 border border-emerald-200/80 font-bold text-emerald-900' : 'bg-slate-50 border border-slate-100'}">
+            <div class="flex items-center gap-2 truncate">
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${color}"></span>
+              <span class="font-medium truncate ${esDisponible ? 'text-emerald-900 font-bold' : 'text-slate-700'}">${item}</span>
             </div>
-            <span class="font-bold text-slate-900">$${formatearMoneda(monto)} (${porcentaje}%)</span>
+            <span class="font-bold text-slate-900 shrink-0 ml-2">$${formatearMoneda(monto)} (${porcentaje}%)</span>
           </div>
         `;
       });
+    }
+
+    function toggleEstadoPago(id) {
+      const mov = movimientos.find(m => m.id === id);
+      if (mov) {
+        mov.pagado = !mov.pagado;
+        actualizarInterfaz();
+      }
     }
 
     function actualizarInterfaz(guardar = true) {
@@ -646,7 +642,12 @@
         sincronizarConFirebase();
       }
 
-      const movimientosMes = movimientos.filter(m => m.fecha.startsWith(mesSeleccionado));
+      const movimientosMes = movimientos.filter(m => {
+        if (m.periodoCobro) {
+          return m.periodoCobro === mesSeleccionado;
+        }
+        return m.fecha.startsWith(mesSeleccionado);
+      });
 
       let totalIngresos = 0;
       let gastosInmediatos = 0;
@@ -668,7 +669,7 @@
 
       const disponibleReal = totalIngresos - gastosInmediatos;
 
-      // CALCULAR RENDIMIENTOS DE INVERSIONES
+      // CALCULAR INVERSIONES
       let capitalTotalInvertido = 0;
       let rendimientoTotalGenerado = 0;
 
@@ -693,17 +694,15 @@
         }
       });
 
-      // Actualizar Tarjetas Principales
       document.getElementById('lbl-disponible').textContent = `$${formatearMoneda(disponibleReal)}`;
       document.getElementById('lbl-ingresos').textContent = `$${formatearMoneda(totalIngresos)}`;
       document.getElementById('lbl-pendientes').textContent = `$${formatearMoneda(gastosDiferidos)}`;
       document.getElementById('lbl-total-invertido').textContent = `$${formatearMoneda(capitalTotalInvertido)}`;
-      document.getElementById('lbl-rendimiento-estimado').textContent = `+$${formatearMoneda(rendimientoTotalGenerado)} rendimientos`;
+      document.getElementById('lbl-rendimiento-estimado').textContent = `+$${formatearMoneda(rendimientoTotalGenerado)} rend.`;
 
-      // Renderizar Gráfico de Torta
       renderizarGraficoTorta(categoriasTotales, disponibleReal, totalIngresos);
 
-      // Ordenar Movimientos
+      // ORDENAMIENTO
       const criterio = document.getElementById('criterio-orden').value;
       movimientosMes.sort((a, b) => {
         if (criterio === 'prioridad') {
@@ -721,15 +720,17 @@
         }
       });
 
-      // Actualizar Tabla Movimientos
+      // TABLA DE MOVIMIENTOS
       const tabla = document.getElementById('tabla-movimientos');
       tabla.innerHTML = '';
 
       if (movimientosMes.length === 0) {
-        tabla.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 italic">Sin movimientos en este periodo.</td></tr>`;
+        tabla.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400 italic">Sin movimientos en este periodo.</td></tr>`;
       } else {
         movimientosMes.forEach(m => {
           const esIngreso = m.tipo === 'ingreso';
+          const estaPagado = !!m.pagado;
+
           let badgeMedio = `<span class="px-2 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-full font-semibold">Ocasional</span>`;
 
           if (m.medio === 'Diferido') {
@@ -739,21 +740,31 @@
           }
 
           tabla.innerHTML += `
-            <tr class="hover:bg-slate-50 transition">
-              <td class="py-3.5 px-4 text-xs font-medium">${m.fecha}</td>
-              <td class="py-3.5 px-4 font-medium text-slate-800">${m.detalle}</td>
-              <td class="py-3.5 px-4 text-xs">${m.categoria || '-'}</td>
-              <td class="py-3.5 px-4 text-xs">${esIngreso ? '-' : badgeMedio}</td>
-              <td class="py-3.5 px-4 text-right font-bold ${esIngreso ? 'text-emerald-600' : 'text-slate-800'}">
+            <tr class="hover:bg-slate-50 transition ${estaPagado ? 'bg-emerald-50/30' : ''}">
+              <td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap">
+                ${!esIngreso ? `
+                  <button onclick="toggleEstadoPago(${m.id})" class="inline-flex items-center gap-1.5 px-2 py-1 rounded-xl text-xs font-bold transition ${estaPagado ? 'bg-emerald-100 text-emerald-800 border border-emerald-300/80 hover:bg-emerald-200' : 'bg-amber-100/80 text-amber-900 border border-amber-300/80 hover:bg-amber-200'}">
+                    <input type="checkbox" ${estaPagado ? 'checked' : ''} class="w-3.5 h-3.5 text-emerald-600 rounded cursor-pointer pointer-events-none">
+                    <span>${estaPagado ? 'Pagado' : 'Pendiente'}</span>
+                  </button>
+                ` : `
+                  <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">-</span>
+                `}
+              </td>
+              <td class="py-3 px-3 sm:px-4 text-xs font-semibold text-slate-700 whitespace-nowrap">${m.fecha}</td>
+              <td class="py-3 px-3 sm:px-4 font-medium ${estaPagado ? 'text-slate-400 line-through' : 'text-slate-800'}">${m.detalle}</td>
+              <td class="py-3 px-3 sm:px-4 text-xs whitespace-nowrap">${m.categoria || '-'}</td>
+              <td class="py-3 px-3 sm:px-4 text-xs whitespace-nowrap">${esIngreso ? '-' : badgeMedio}</td>
+              <td class="py-3 px-3 sm:px-4 text-right font-bold whitespace-nowrap ${esIngreso ? 'text-emerald-600' : (estaPagado ? 'text-slate-400' : 'text-slate-800')}">
                 ${esIngreso ? '+' : '-'}$${formatearMoneda(parseFloat(m.monto))}
               </td>
-              <td class="py-3.5 px-4 text-center">
+              <td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap">
                 <div class="flex items-center justify-center gap-2">
                   <button onclick="abrirEdicionMonto(${m.id})" class="text-slate-400 hover:text-indigo-600 transition" title="Editar Monto">
-                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                    <i data-lucide="pencil" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
                   </button>
                   <button onclick="eliminarMovimiento(${m.id})" class="text-slate-300 hover:text-rose-600 transition" title="Eliminar">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
                   </button>
                 </div>
               </td>
@@ -762,7 +773,7 @@
         });
       }
 
-      // RENDERIZAR MÓDULO DE INVERSIONES
+      // RENDERIZAR INVERSIONES
       const contenedorInv = document.getElementById('contenedor-inversiones');
       contenedorInv.innerHTML = '';
 
@@ -773,16 +784,16 @@
           const esBilletera = inv.tipo === 'billetera';
           
           contenedorInv.innerHTML += `
-            <div class="p-4 rounded-2xl border ${esBilletera ? 'bg-purple-50/50 border-purple-100' : 'bg-blue-50/50 border-blue-100'} space-y-3">
+            <div class="p-3.5 rounded-2xl border ${esBilletera ? 'bg-purple-50/50 border-purple-100' : 'bg-blue-50/50 border-blue-100'} space-y-2.5">
               <div class="flex justify-between items-start">
                 <div>
-                  <span class="text-[10px] font-bold uppercase tracking-wider ${esBilletera ? 'text-purple-600' : 'text-blue-600'}">
+                  <span class="text-[9px] font-bold uppercase tracking-wider ${esBilletera ? 'text-purple-600' : 'text-blue-600'}">
                     ${esBilletera ? 'Billetera Virtual' : `Plazo Fijo (${inv.dias} Días)`}
                   </span>
-                  <h3 class="text-base font-bold text-slate-800">${inv.nombre}</h3>
+                  <h3 class="text-sm font-bold text-slate-800">${inv.nombre}</h3>
                 </div>
                 <div class="text-right flex items-center gap-1">
-                  <span class="text-xs bg-white px-2 py-1 rounded-lg border font-bold text-slate-700">TNA: ${inv.tna}%</span>
+                  <span class="text-[11px] bg-white px-2 py-0.5 rounded-lg border font-bold text-slate-700">TNA: ${inv.tna}%</span>
                   ${esBilletera ? `
                     <button onclick="editarTNAInversion(${inv.id})" class="text-slate-400 hover:text-purple-600 p-1" title="Editar TNA diario">
                       <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
@@ -793,36 +804,36 @@
 
               <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200/60 text-xs">
                 <div>
-                  <p class="text-slate-400">Capital Invertido</p>
-                  <p class="text-base font-extrabold text-slate-800">$${formatearMoneda(parseFloat(inv.monto))}</p>
+                  <p class="text-slate-400 text-[10px]">Capital Invertido</p>
+                  <p class="text-sm font-extrabold text-slate-800">$${formatearMoneda(parseFloat(inv.monto))}</p>
                 </div>
                 <div>
-                  <p class="text-slate-400">${esBilletera ? 'Rendimiento Diario' : 'Interés al Vencimiento'}</p>
-                  <p class="text-base font-extrabold text-emerald-600">
+                  <p class="text-slate-400 text-[10px]">${esBilletera ? 'Rendimiento Diario' : 'Interés al Vencimiento'}</p>
+                  <p class="text-sm font-extrabold text-emerald-600">
                     +$${formatearMoneda(esBilletera ? inv.rendimientoDiario : inv.rendimientoTotal)}
                   </p>
                 </div>
               </div>
 
               ${esBilletera ? `
-                <div class="bg-white/80 p-2 rounded-xl text-[11px] text-slate-600 flex justify-between items-center">
-                  <span>Ganancia Estimada Acumulada:</span>
+                <div class="bg-white/80 p-2 rounded-xl text-[10px] text-slate-600 flex justify-between items-center">
+                  <span>Ganancia Acumulada:</span>
                   <span class="font-bold text-purple-700">+$${formatearMoneda(inv.rendimientoAcumulado)}</span>
                 </div>
               ` : ''}
 
-              <div class="flex justify-between items-center pt-2">
+              <div class="flex justify-between items-center pt-1">
                 <div class="flex gap-1">
-                  <button onclick="ajustarCapitalInversion(${inv.id}, 'suma')" class="text-xs bg-white hover:bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border font-semibold flex items-center gap-1 shadow-sm">
+                  <button onclick="ajustarCapitalInversion(${inv.id}, 'suma')" class="text-[11px] bg-white hover:bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border font-semibold flex items-center gap-1 shadow-xs">
                     <i data-lucide="plus" class="w-3 h-3 text-emerald-600"></i> Depositar
                   </button>
-                  <button onclick="ajustarCapitalInversion(${inv.id}, 'resta')" class="text-xs bg-white hover:bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border font-semibold flex items-center gap-1 shadow-sm">
+                  <button onclick="ajustarCapitalInversion(${inv.id}, 'resta')" class="text-[11px] bg-white hover:bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border font-semibold flex items-center gap-1 shadow-xs">
                     <i data-lucide="minus" class="w-3 h-3 text-rose-600"></i> Retirar
                   </button>
                 </div>
 
-                <button onclick="eliminarInversion(${inv.id})" class="text-slate-300 hover:text-rose-600 transition" title="Eliminar Inversión">
-                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <button onclick="eliminarInversion(${inv.id})" class="text-slate-300 hover:text-rose-600 transition p-1" title="Eliminar Inversión">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                 </button>
               </div>
             </div>
@@ -833,7 +844,6 @@
       lucide.createIcons();
     }
 
-    // Funciones Modales
     function abrirModalGasto() { document.getElementById('modal-gasto').classList.remove('hidden'); document.getElementById('modal-gasto').classList.add('flex'); }
     function abrirModalIngreso() { document.getElementById('modal-ingreso').classList.remove('hidden'); document.getElementById('modal-ingreso').classList.add('flex'); }
     function abrirModalInversion() { document.getElementById('modal-inversion').classList.remove('hidden'); document.getElementById('modal-inversion').classList.add('flex'); }
@@ -848,16 +858,20 @@
       const medio = document.getElementById('gasto-medio').value;
       const esRecurrente = document.getElementById('gasto-es-recurrente').checked;
       const mesActual = obtenerMesSeleccionado();
+      const fechaHoyReal = obtenerFechaHoyISO();
 
       if (medio === 'Diferido') {
         const numCuotas = parseInt(document.getElementById('gasto-cuotas').value);
         const offsetMeses = parseInt(document.getElementById('gasto-inicio-cuota').value);
         const montoPorCuota = montoTotal / numCuotas;
+        
         const fechaBase = new Date();
 
         for (let i = 0; i < numCuotas; i++) {
-          const fechaCuota = new Date(fechaBase.getFullYear(), fechaBase.getMonth() + offsetMeses + i, 1);
-          const fechaStr = fechaCuota.toISOString().slice(0, 10);
+          const fechaCobro = new Date(fechaBase.getFullYear(), fechaBase.getMonth() + offsetMeses + i, 1);
+          const anioC = fechaCobro.getFullYear();
+          const mesC = String(fechaCobro.getMonth() + 1).padStart(2, '0');
+          const periodoCobroStr = `${anioC}-${mesC}`;
 
           movimientos.push({
             id: Date.now() + i,
@@ -867,7 +881,9 @@
             categoria: categoria,
             medio: medio,
             infoCuota: numCuotas > 1 ? `Cuota ${i + 1}/${numCuotas}` : 'Tarjeta',
-            fecha: fechaStr
+            pagado: false, // Inicia pendiente por ser cuota de tarjeta
+            fecha: fechaHoyReal,
+            periodoCobro: periodoCobroStr
           });
         }
       } else if (esRecurrente) {
@@ -880,6 +896,7 @@
         };
         serviciosRecurrentes.push(nuevoServicio);
       } else {
+        // Gasto Ocasional (Contado / Débito)
         movimientos.push({
           id: Date.now(),
           tipo: 'gasto',
@@ -887,7 +904,9 @@
           detalle: detalle,
           categoria: categoria,
           medio: 'Inmediato',
-          fecha: `${mesActual}-01`
+          pagado: true, // <-- INICIA TILDADO / PAGADO AL SER DE CONTADO
+          fecha: fechaHoyReal,
+          periodoCobro: mesActual
         });
       }
 
@@ -897,9 +916,9 @@
       evaluarMedioPago();
     }
 
-    // GUARDAR INGRESO
     function guardarIngreso(e) {
       e.preventDefault();
+      const fechaHoyReal = obtenerFechaHoyISO();
       const mesActual = obtenerMesSeleccionado();
       const nuevoIngreso = {
         id: Date.now(),
@@ -908,7 +927,8 @@
         detalle: document.getElementById('ingreso-detalle').value,
         categoria: 'Ingresos',
         medio: 'Inmediato',
-        fecha: `${mesActual}-01`
+        fecha: fechaHoyReal,
+        periodoCobro: mesActual
       };
       movimientos.push(nuevoIngreso);
       actualizarInterfaz();
@@ -916,7 +936,6 @@
       document.getElementById('form-ingreso').reset();
     }
 
-    // GUARDAR NUEVA INVERSIÓN
     function guardarInversion(e) {
       e.preventDefault();
       const nombre = document.getElementById('inv-nombre').value;
@@ -940,7 +959,6 @@
       document.getElementById('form-inversion').reset();
     }
 
-    // EDITAR TNA EN BILLETERAS VIRTUALES
     function editarTNAInversion(id) {
       const inv = inversiones.find(i => i.id === id);
       if (!inv || inv.tipo !== 'billetera') return;
@@ -954,7 +972,6 @@
       }
     }
 
-    // DEPOSITAR O RETIRAR DINERO
     function ajustarCapitalInversion(id, accion) {
       const inv = inversiones.find(i => i.id === id);
       if (!inv) return;
@@ -980,7 +997,6 @@
       }
     }
 
-    // EDITAR MONTO DE UN MOVIMIENTO
     function abrirEdicionMonto(id) {
       const mov = movimientos.find(m => m.id === id);
       if (!mov) return;
@@ -1010,9 +1026,10 @@
         mov.monto = nuevoMonto;
 
         if (mov.esRecurrente && mov.servicioId) {
-          const fechaCorte = mov.fecha.slice(0, 7);
+          const fechaCorte = mov.periodoCobro || mov.fecha.slice(0, 7);
           movimientos.forEach(m => {
-            if (m.servicioId === mov.servicioId && m.fecha.slice(0, 7) >= fechaCorte) {
+            const pCobro = m.periodoCobro || m.fecha.slice(0, 7);
+            if (m.servicioId === mov.servicioId && pCobro >= fechaCorte) {
               m.monto = nuevoMonto;
             }
           });
@@ -1023,7 +1040,6 @@
       cerrarModal('modal-editar');
     }
 
-    // ELIMINAR MOVIMIENTO
     function eliminarMovimiento(id) {
       const mov = movimientos.find(m => m.id === id);
       if (!mov) return;
@@ -1031,13 +1047,16 @@
       if (mov.esRecurrente && mov.servicioId) {
         const cancelarFuturo = confirm(`"${mov.detalle}" es un servicio recurrente.\n\n- OPRIME "ACEPTAR" para cancelar la suscripción de este mes en adelante.\n- OPRIME "CANCELAR" para eliminar solo la entrada de este mes.`);
         
-        const mesCorte = mov.fecha.slice(0, 7);
+        const mesCorte = mov.periodoCobro || mov.fecha.slice(0, 7);
         
         if (cancelarFuturo) {
           const servicio = serviciosRecurrentes.find(s => s.id === mov.servicioId);
           if (servicio) servicio.fechaFin = mesCorte;
 
-          movimientos = movimientos.filter(m => !(m.servicioId === mov.servicioId && m.fecha.slice(0, 7) >= mesCorte));
+          movimientos = movimientos.filter(m => {
+            const pCobro = m.periodoCobro || m.fecha.slice(0, 7);
+            return !(m.servicioId === mov.servicioId && pCobro >= mesCorte);
+          });
         } else {
           movimientos = movimientos.filter(m => m.id !== id);
         }
