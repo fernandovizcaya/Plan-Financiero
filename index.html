@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Control de Gastos - Plan Financiero</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js para el gráfico de doughnut -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- SDKs de Firebase (v8 compat para integración directa) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body class="bg-slate-800 text-slate-800 font-sans antialiased min-h-screen pb-12">
+
+  <!-- NAVEGACIÓN SUPERIOR CON DEGRADADO ELEGANTE -->
+  <nav class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl sticky top-0 z-10 border-b border-indigo-500/20">
+    <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
+      <div class="flex items-center gap-2.5">
+        <div class="p-2 bg-indigo-500/20 rounded-xl border border-indigo-400/30">
+          <i data-lucide="wallet" class="w-5 h-5 text-indigo-400"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight hidden sm:block text-slate-100">Mi Control de Gastos</h1>
+          <p class="text-[10px] text-indigo-300/80 hidden sm:block font-medium" id="estado-conexion">🟢 Conectado a la nube</p>
+        </div>
+      </div>
+      
+      <!-- Selector de Mes y Año unificados -->
+      <div class="flex items-center gap-1.5 bg-slate-800/80 hover:bg-slate-800 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 transition shadow-inner">
+        <i data-lucide="calendar" class="w-4 h-4 text-indigo-400"></i>
+        <select id="filtro-mes" onchange="actualizarInterfaz()" class="bg-transparent text-white text-xs sm:text-sm font-semibold outline-none cursor-pointer py-0.5">
+          <option value="01" class="bg-slate-900 text-white">Enero</option>
+          <option value="02" class="bg-slate-900 text-white">Febrero</option>
+          <option value="03" class="bg-slate-900 text-white">Marzo</option>
+          <option value="04" class="bg-slate-900 text-white">Abril</option>
+          <option value="05" class="bg-slate-900 text-white">Mayo</option>
+          <option value="06" class="bg-slate-900 text-white">Junio</option>
+          <option value="07" class="bg-slate-900 text-white">Julio</option>
+          <option value="08" class="bg-slate-900 text-white">Agosto</option>
+          <option value="09" class="bg-slate-900 text-white">Septiembre</option>
+          <option value="10" class="bg-slate-900 text-white">Octubre</option>
+          <option value="11" class="bg-slate-900 text-white">Noviembre</option>
+          <option value="12" class="bg-slate-900 text-white">Diciembre</option>
+        </select>
+        <select id="filtro-anio" onchange="actualizarInterfaz()" class="bg-transparent text-white text-xs sm:text-sm font-semibold outline-none cursor-pointer py-0.5">
+          <!-- Generado dinámicamente -->
+        </select>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto px-4 mt-6 space-y-6">
+
+    <!-- RESUMEN DE SALDOS (Tarjetas principales) -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Disponible Real -->
+      <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-200/60 flex flex-col justify-between transition hover:shadow-xl hover:-translate-y-0.5">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold uppercase text-slate-400 tracking-wider">Disponible Real</span>
+          <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
+            <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-2xl font-black text-slate-900 tracking-tight" id="lbl-disponible">$0,00</p>
+          <p class="text-[11px] font-medium text-slate-400 mt-1">Ingresos - Gastos Inmediatos</p>
+        </div>
+      </div>
+
+      <!-- Total Ingresos -->
+      <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-200/60 flex flex-col justify-between transition hover:shadow-xl hover:-translate-y-0.5">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold uppercase text-slate-400 tracking-wider">Ingresos del Mes</span>
+          <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+            <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-2xl font-black text-slate-900 tracking-tight" id="lbl-ingresos">$0,00</p>
+          <p class="text-[11px] font-medium text-slate-400 mt-1">Fijos + Extra</p>
+        </div>
+      </div>
+
+      <!-- Pendiente por Pagar / Cuotas -->
+      <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-200/60 flex flex-col justify-between transition hover:shadow-xl hover:-translate-y-0.5">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold uppercase text-slate-400 tracking-wider">Tarjetas / Cuotas</span>
+          <div class="p-2.5 bg-amber-50 text-amber-600 rounded-xl">
+            <i data-lucide="credit-card" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-2xl font-black text-amber-600 tracking-tight" id="lbl-pendientes">$0,00</p>
+          <p class="text-[11px] font-medium text-slate-400 mt-1">Resumen a pagar este mes</p>
+        </div>
+      </div>
+
+      <!-- Total Invertido -->
+      <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-200/60 flex flex-col justify-between transition hover:shadow-xl hover:-translate-y-0.5">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold uppercase text-slate-400 tracking-wider">Total Invertido</span>
+          <div class="p-2.5 bg-purple-50 text-purple-600 rounded-xl">
+            <i data-lucide="trending-up" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-2xl font-black text-purple-700 tracking-tight" id="lbl-total-invertido">$0,00</p>
+          <p class="text-[11px] font-medium text-purple-600/80 mt-1" id="lbl-rendimiento-estimado">+$0,00 rendimientos</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOTONES DE ACCIÓN RÁPIDA -->
+    <section class="grid grid-cols-2 gap-4">
+      <button onclick="abrirModalGasto()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transition active:scale-98">
+        <i data-lucide="minus-circle" class="w-5 h-5"></i>
+        <span>Registrar Gasto</span>
+      </button>
+      <button onclick="abrirModalIngreso()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transition active:scale-98">
+        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+        <span>Registrar Ingreso</span>
+      </button>
+    </section>
+
+    <!-- GASTOS Y DISPONIBLE POR CATEGORÍA (GRÁFICO DE TORTA) -->
+    <section class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200/60">
+      <h2 class="text-base font-bold text-slate-800 mb-5 flex items-center gap-2">
+        <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-600"></i>
+        Distribución de Ingresos y Gastos (Mes Seleccionado)
+      </h2>
+      
+      <div id="contenedor-grafico-vacio" class="text-center py-10 text-slate-400 text-sm italic hidden">
+        No hay ingresos ni gastos registrados en este mes para mostrar el gráfico.
+      </div>
+
+      <div id="contenedor-grafico" class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <!-- Lienzo del Gráfico -->
+        <div class="relative max-w-[250px] mx-auto w-full aspect-square">
+          <canvas id="chartCategorias"></canvas>
+        </div>
+
+        <!-- Leyenda Personalizada -->
+        <div id="leyenda-categorias" class="space-y-2">
+          <!-- Se genera dinámicamente -->
+        </div>
+      </div>
+    </section>
+
+    <!-- PLANILLA DE MOVIMIENTOS COMPLETA -->
+    <section class="bg-white rounded-2xl shadow-lg border border-slate-200/60 overflow-hidden">
+      <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50/50">
+        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+          <i data-lucide="list" class="w-5 h-5 text-indigo-600"></i>
+          Planilla de Movimientos
+        </h2>
+        
+        <!-- Selector de Criterio de Ordenamiento -->
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+          <span class="font-medium">Ordenar por:</span>
+          <select id="criterio-orden" onchange="actualizarInterfaz()" class="bg-white text-slate-700 font-semibold px-3 py-1.5 rounded-xl border border-slate-200 outline-none cursor-pointer shadow-xs">
+            <option value="prioridad">Por Tipo / Categoría</option>
+            <option value="fecha-desc">Fecha (Más reciente primero)</option>
+            <option value="fecha-asc">Fecha (Más antigua primero)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-600">
+          <thead class="bg-slate-50 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-100">
+            <tr>
+              <th class="py-3.5 px-4">Fecha</th>
+              <th class="py-3.5 px-4">Detalle / Concepto</th>
+              <th class="py-3.5 px-4">Categoría</th>
+              <th class="py-3.5 px-4">Medio / Tipo</th>
+              <th class="py-3.5 px-4 text-right">Monto</th>
+              <th class="py-3.5 px-4 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-movimientos" class="divide-y divide-slate-100">
+            <!-- Filas dinámicas -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: INVERSIONES Y AHORROS -->
+    <section class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200/60 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+        <div>
+          <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+            <i data-lucide="piggy-bank" class="w-5 h-5 text-purple-600"></i>
+            Ahorros e Inversiones
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Control de cuentas remuneradas y plazos fijos</p>
+        </div>
+        <button onclick="abrirModalInversion()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2.5 px-3.5 rounded-xl shadow-md hover:shadow-lg flex items-center gap-1.5 transition">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>Nueva Inversión</span>
+        </button>
+      </div>
+
+      <div id="contenedor-inversiones" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Tarjetas dinámicas de inversiones -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: REGISTRAR GASTO -->
+  <div id="modal-gasto" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-base font-bold text-slate-800">Registrar Nuevo Gasto</h3>
+        <button onclick="cerrarModal('modal-gasto')" class="text-slate-400 hover:text-slate-600 p-1">&times;</button>
+      </div>
+
+      <form id="form-gasto" onsubmit="guardarGasto(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Monto ($)</label>
+          <input type="number" step="0.01" id="gasto-monto" required placeholder="0.00" class="w-full border border-slate-200 rounded-xl p-3 text-lg font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Detalle / Concepto</label>
+          <input type="text" id="gasto-detalle" required placeholder="Ej. Luz, Club, Netflix, Nafta" class="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Categoría</label>
+            <select id="gasto-categoria" class="w-full border border-slate-200 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="Impuestos y Servicios">Impuestos y Servicios</option>
+              <option value="Supermercado/Comida">Supermercado/Comida</option>
+              <option value="Transporte/Auto">Transporte/Auto</option>
+              <option value="Salud/Farmacia">Salud/Farmacia</option>
+              <option value="Ocio y Salidas">Ocio y Salidas</option>
+              <option value="Hogar y Compras">Hogar y Compras</option>
+              <option value="Otros Gastos">Otros Gastos</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Medio de Pago</label>
+            <select id="gasto-medio" onchange="evaluarMedioPago()" class="w-full border border-slate-200 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="Inmediato">Efectivo / Débito (Inmediato)</option>
+              <option value="Diferido">Tarjeta de Crédito (Cuotas)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="campo-recurrente" class="flex items-center gap-2 p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl">
+          <input type="checkbox" id="gasto-es-recurrente" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
+          <label for="gasto-es-recurrente" class="text-xs font-semibold text-indigo-900 cursor-pointer">
+            Gasto Recurrente / Servicio Fijo (Aparece todos los meses)
+          </label>
+        </div>
+
+        <div id="campo-cuotas" class="hidden space-y-3 p-3 bg-amber-50/70 border border-amber-200 rounded-xl">
+          <div>
+            <label class="block text-xs font-semibold text-amber-900 uppercase mb-1">Cantidad de Cuotas</label>
+            <select id="gasto-cuotas" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="1">1 cuota</option>
+              <option value="2">2 cuotas</option>
+              <option value="3">3 cuotas</option>
+              <option value="4">4 cuotas</option>
+              <option value="5">5 cuotas</option>
+              <option value="6">6 cuotas</option>
+              <option value="7">7 cuotas</option>
+              <option value="8">8 cuotas</option>
+              <option value="9">9 cuotas</option>
+              <option value="10">10 cuotas</option>
+              <option value="11">11 cuotas</option>
+              <option value="12">12 cuotas</option>
+              <option value="18">18 cuotas</option>
+              <option value="24">24 cuotas</option>
+              <option value="36">36 cuotas</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-amber-900 uppercase mb-1">¿Cuándo se paga la 1.ª cuota?</label>
+            <select id="gasto-inicio-cuota" class="w-full border border-amber-300 bg-white rounded-xl p-2.5 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="0">Este mes (Mes actual)</option>
+              <option value="1" selected>El próximo mes (+1 mes)</option>
+              <option value="2">En 2 meses (+2 meses)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="cerrarModal('modal-gasto')" class="w-1/2 py-3 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Cancelar</button>
+          <button type="submit" class="w-1/2 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 font-bold text-white shadow-sm">Guardar Gasto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR INGRESO -->
+  <div id="modal-ingreso" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-base font-bold text-slate-800">Registrar Ingreso</h3>
+        <button onclick="cerrarModal('modal-ingreso')" class="text-slate-400 hover:text-slate-600 p-1">&times;</button>
+      </div>
+
+      <form id="form-ingreso" onsubmit="guardarIngreso(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Monto ($)</label>
+          <input type="number" step="0.01" id="ingreso-monto" required placeholder="0.00" class="w-full border border-slate-200 rounded-xl p-3 text-lg font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Detalle / Origen</label>
+          <input type="text" id="ingreso-detalle" required placeholder="Ej. Sueldo, Trabajo Extra, Venta" class="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="cerrarModal('modal-ingreso')" class="w-1/2 py-3 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Cancelar</button>
+          <button type="submit" class="w-1/2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-white shadow-sm">Guardar Ingreso</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR MONTO -->
+  <div id="modal-editar" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-base font-bold text-slate-800">Editar Monto</h3>
+        <button onclick="cerrarModal('modal-editar')" class="text-slate-400 hover:text-slate-600 p-1">&times;</button>
+      </div>
+
+      <form id="form-editar" onsubmit="guardarEdicionMonto(event)" class="space-y-4">
+        <input type="hidden" id="edit-id">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1" id="edit-detalle-lbl">Detalle</label>
+          <input type="number" step="0.01" id="edit-monto" required class="w-full border border-slate-200 rounded-xl p-3 text-lg font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <p id="edit-aviso-futuro" class="text-xs text-indigo-800 bg-indigo-50 p-2.5 rounded-xl border border-indigo-100 hidden">
+          ⚡ Al modificar este servicio, el nuevo monto se aplicará a este mes y a todos los meses futuros.
+        </p>
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="cerrarModal('modal-editar')" class="w-1/2 py-2.5 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Cancelar</button>
+          <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 font-bold text-white shadow-sm">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: NUEVA INVERSIÓN / AHORRO -->
+  <div id="modal-inversion" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-base font-bold text-slate-800">Nueva Inversión / Ahorro</h3>
+        <button onclick="cerrarModal('modal-inversion')" class="text-slate-400 hover:text-slate-600 p-1">&times;</button>
+      </div>
+
+      <form id="form-inversion" onsubmit="guardarInversion(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombre / Entidad</label>
+          <input type="text" id="inv-nombre" required placeholder="Ej. Mercado Pago, Plazo Fijo BNA, Ualá" class="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tipo de Instrumento</label>
+            <select id="inv-tipo" onchange="evaluarTipoInversion()" class="w-full border border-slate-200 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-purple-500">
+              <option value="billetera">Billetera Virtual (Diario)</option>
+              <option value="plazo_fijo">Plazo Fijo (Vencimiento)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Monto Inicial ($)</label>
+            <input type="number" step="0.01" id="inv-monto" required placeholder="0.00" class="w-full border border-slate-200 rounded-xl p-3 text-slate-800 font-bold focus:ring-2 focus:ring-purple-500 outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tasa Anual (TNA %)</label>
+            <input type="number" step="0.1" id="inv-tna" required placeholder="Ej. 35" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-purple-500 outline-none">
+          </div>
+
+          <div id="campo-dias-pf" class="hidden">
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Plazo (Días)</label>
+            <input type="number" id="inv-dias" value="30" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-purple-500 outline-none">
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="cerrarModal('modal-inversion')" class="w-1/2 py-3 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Cancelar</button>
+          <button type="submit" class="w-1/2 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 font-bold text-white shadow-sm">Crear Inversión</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Configuración de tu cuenta de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBaAz8p2S1IuUCqFOmZimyNq04lS7ybVtw",
+      authDomain: "fer-plan-financiero.firebaseapp.com",
+      databaseURL: "https://fer-plan-financiero-default-rtdb.firebaseio.com",
+      projectId: "fer-plan-financiero",
+      storageBucket: "fer-plan-financiero.firebasestorage.app",
+      messagingSenderId: "936146923789",
+      appId: "1:936146923789:web:90b2bcb47998291a96c044",
+      measurementId: "G-6JC170LGZT"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const dbRef = firebase.database().ref("appData");
+
+    // Inicializar íconos
+    lucide.createIcons();
+
+    // Formatear moneda con separador de miles
+    function formatearMoneda(valor) {
+      return new Intl.NumberFormat('es-AR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(valor);
+    }
+
+    const COLOR_DISPONIBLE = '#10b981';
+    const PALETA_COLORES_GASTOS = [
+      '#6366f1', '#ec4899', '#f59e0b', '#8b5cf6', 
+      '#06b6d4', '#f43f5e', '#64748b', '#3b82f6'
+    ];
+
+    let miGraficoTorta = null;
+
+    // Inicializar combos de Fecha (Mes y Año)
+    const hoy = new Date();
+    const anioActual = hoy.getFullYear();
+    const mesActualNum = String(hoy.getMonth() + 1).padStart(2, '0');
+
+    const comboAnio = document.getElementById('filtro-anio');
+    for (let a = anioActual - 2; a <= anioActual + 5; a++) {
+      const option = document.createElement('option');
+      option.value = a;
+      option.textContent = a;
+      option.className = 'bg-slate-900 text-white';
+      if (a === anioActual) option.selected = true;
+      comboAnio.appendChild(option);
+    }
+    document.getElementById('filtro-mes').value = mesActualNum;
+
+    // Variables globales
+    let movimientos = [];
+    let serviciosRecurrentes = [];
+    let inversiones = [];
+
+    // ESCUCHAR CAMBIOS EN TIEMPO REAL DESDE FIREBASE
+    dbRef.on('value', (snapshot) => {
+      const data = snapshot.val() || {};
+      movimientos = data.movimientos || [];
+      serviciosRecurrentes = data.serviciosRecurrentes || [];
+      inversiones = data.inversiones || [];
+
+      document.getElementById('estado-conexion').textContent = '🟢 Sincronizado en tiempo real';
+      actualizarInterfaz(false);
+    }, (error) => {
+      document.getElementById('estado-conexion').textContent = '🔴 Sin conexión';
+    });
+
+    // Guardar estado completo en Firebase
+    function sincronizarConFirebase() {
+      dbRef.set({
+        movimientos: movimientos,
+        serviciosRecurrentes: serviciosRecurrentes,
+        inversiones: inversiones
+      });
+    }
+
+    function evaluarMedioPago() {
+      const medio = document.getElementById('gasto-medio').value;
+      const campoCuotas = document.getElementById('campo-cuotas');
+      const campoRecurrente = document.getElementById('campo-recurrente');
+
+      if (medio === 'Diferido') {
+        campoCuotas.classList.remove('hidden');
+        campoRecurrente.classList.add('hidden');
+        document.getElementById('gasto-es-recurrente').checked = false;
+      } else {
+        campoCuotas.classList.add('hidden');
+        campoRecurrente.classList.remove('hidden');
+      }
+    }
+
+    function evaluarTipoInversion() {
+      const tipo = document.getElementById('inv-tipo').value;
+      const campoDias = document.getElementById('campo-dias-pf');
+      if (tipo === 'plazo_fijo') {
+        campoDias.classList.remove('hidden');
+      } else {
+        campoDias.classList.add('hidden');
+      }
+    }
+
+    function obtenerMesSeleccionado() {
+      const mes = document.getElementById('filtro-mes').value;
+      const anio = document.getElementById('filtro-anio').value;
+      return `${anio}-${mes}`;
+    }
+
+    function asegurarServiciosEnMes(mesSeleccionado) {
+      let cambioRealizado = false;
+      serviciosRecurrentes.forEach(servicio => {
+        if (servicio.fechaInicio <= mesSeleccionado) {
+          const yaExiste = movimientos.some(m => m.servicioId === servicio.id && m.fecha.startsWith(mesSeleccionado));
+          const cancelado = servicio.fechaFin && servicio.fechaFin <= mesSeleccionado;
+
+          if (!yaExiste && !cancelado) {
+            const movimientosPrevios = movimientos
+              .filter(m => m.servicioId === servicio.id && m.fecha < mesSeleccionado)
+              .sort((a, b) => b.fecha.localeCompare(a.fecha));
+
+            const montoActualizado = movimientosPrevios.length > 0 ? movimientosPrevios[0].monto : servicio.montoBase;
+
+            movimientos.push({
+              id: Date.now() + Math.floor(Math.random() * 1000),
+              servicioId: servicio.id,
+              tipo: 'gasto',
+              monto: montoActualizado,
+              detalle: servicio.detalle,
+              categoria: servicio.categoria,
+              medio: 'Inmediato',
+              esRecurrente: true,
+              fecha: `${mesSeleccionado}-01`
+            });
+            cambioRealizado = true;
+          }
+        }
+      });
+      if (cambioRealizado) {
+        sincronizarConFirebase();
+      }
+    }
+
+    function renderizarGraficoTorta(categoriasTotales, disponibleReal, totalIngresos) {
+      const ctx = document.getElementById('chartCategorias').getContext('2d');
+      const contenedorGrafico = document.getElementById('contenedor-grafico');
+      const contenedorVacio = document.getElementById('contenedor-grafico-vacio');
+      const leyenda = document.getElementById('leyenda-categorias');
+
+      if (totalIngresos === 0 && Object.keys(categoriasTotales).length === 0) {
+        contenedorGrafico.classList.add('hidden');
+        contenedorVacio.classList.remove('hidden');
+        if (miGraficoTorta) miGraficoTorta.destroy();
+        return;
+      }
+
+      contenedorGrafico.classList.remove('hidden');
+      contenedorVacio.classList.add('hidden');
+
+      if (miGraficoTorta) {
+        miGraficoTorta.destroy();
+      }
+
+      const etiquetas = [];
+      const montos = [];
+      const coloresUsados = [];
+
+      if (disponibleReal > 0) {
+        etiquetas.push('Disponible Real');
+        montos.push(disponibleReal);
+        coloresUsados.push(COLOR_DISPONIBLE);
+      }
+
+      let colIndex = 0;
+      for (const [cat, monto] of Object.entries(categoriasTotales)) {
+        etiquetas.push(cat);
+        montos.push(monto);
+        coloresUsados.push(PALETA_COLORES_GASTOS[colIndex % PALETA_COLORES_GASTOS.length]);
+        colIndex++;
+      }
+
+      const totalBaseCalculo = totalIngresos > 0 ? totalIngresos : montos.reduce((a, b) => a + b, 0);
+
+      miGraficoTorta = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: etiquetas,
+          datasets: [{
+            data: montos,
+            backgroundColor: coloresUsados,
+            borderWidth: 2,
+            borderColor: '#ffffff',
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const valor = context.raw;
+                  const porcentaje = totalBaseCalculo > 0 ? ((valor / totalBaseCalculo) * 100).toFixed(1) : 0;
+                  return ` $${formatearMoneda(valor)} (${porcentaje}%)`;
+                }
+              }
+            }
+          },
+          cutout: '65%'
+        }
+      });
+
+      leyenda.innerHTML = '';
+      etiquetas.forEach((item, index) => {
+        const monto = montos[index];
+        const porcentaje = totalBaseCalculo > 0 ? ((monto / totalBaseCalculo) * 100).toFixed(0) : 0;
+        const color = coloresUsados[index];
+        const esDisponible = item === 'Disponible Real';
+
+        leyenda.innerHTML += `
+          <div class="flex items-center justify-between text-xs p-2.5 rounded-xl ${esDisponible ? 'bg-emerald-50 border border-emerald-200/80 font-bold text-emerald-900' : 'bg-slate-50 border border-slate-100'}">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full" style="background-color: ${color}"></span>
+              <span class="font-medium ${esDisponible ? 'text-emerald-900 font-bold' : 'text-slate-700'}">${item}</span>
+            </div>
+            <span class="font-bold text-slate-900">$${formatearMoneda(monto)} (${porcentaje}%)</span>
+          </div>
+        `;
+      });
+    }
+
+    function actualizarInterfaz(guardar = true) {
+      const mesSeleccionado = obtenerMesSeleccionado();
+      asegurarServiciosEnMes(mesSeleccionado);
+
+      if (guardar) {
+        sincronizarConFirebase();
+      }
+
+      const movimientosMes = movimientos.filter(m => m.fecha.startsWith(mesSeleccionado));
+
+      let totalIngresos = 0;
+      let gastosInmediatos = 0;
+      let gastosDiferidos = 0;
+      let categoriasTotales = {};
+
+      movimientosMes.forEach(m => {
+        if (m.tipo === 'ingreso') {
+          totalIngresos += parseFloat(m.monto);
+        } else {
+          if (m.medio === 'Inmediato') {
+            gastosInmediatos += parseFloat(m.monto);
+          } else {
+            gastosDiferidos += parseFloat(m.monto);
+          }
+          categoriasTotales[m.categoria] = (categoriasTotales[m.categoria] || 0) + parseFloat(m.monto);
+        }
+      });
+
+      const disponibleReal = totalIngresos - gastosInmediatos;
+
+      // CALCULAR RENDIMIENTOS DE INVERSIONES
+      let capitalTotalInvertido = 0;
+      let rendimientoTotalGenerado = 0;
+
+      inversiones.forEach(inv => {
+        capitalTotalInvertido += parseFloat(inv.monto);
+        const tnaDecimal = inv.tna / 100;
+
+        if (inv.tipo === 'billetera') {
+          const rendimientoDiario = (inv.monto * tnaDecimal) / 365;
+          const fechaInicio = new Date(inv.fechaInicio);
+          const diasDiferencia = Math.max(0, Math.floor((hoy - fechaInicio) / (1000 * 60 * 60 * 24)));
+          
+          inv.rendimientoDiario = rendimientoDiario;
+          inv.rendimientoAcumulado = rendimientoDiario * diasDiferencia;
+          rendimientoTotalGenerado += inv.rendimientoAcumulado;
+
+        } else if (inv.tipo === 'plazo_fijo') {
+          const rendimientoTotalPF = (inv.monto * tnaDecimal * inv.dias) / 365;
+          inv.rendimientoTotal = rendimientoTotalPF;
+          inv.rendimientoDiario = rendimientoTotalPF / inv.dias;
+          rendimientoTotalGenerado += rendimientoTotalPF;
+        }
+      });
+
+      // Actualizar Tarjetas Principales
+      document.getElementById('lbl-disponible').textContent = `$${formatearMoneda(disponibleReal)}`;
+      document.getElementById('lbl-ingresos').textContent = `$${formatearMoneda(totalIngresos)}`;
+      document.getElementById('lbl-pendientes').textContent = `$${formatearMoneda(gastosDiferidos)}`;
+      document.getElementById('lbl-total-invertido').textContent = `$${formatearMoneda(capitalTotalInvertido)}`;
+      document.getElementById('lbl-rendimiento-estimado').textContent = `+$${formatearMoneda(rendimientoTotalGenerado)} rendimientos`;
+
+      // Renderizar Gráfico de Torta
+      renderizarGraficoTorta(categoriasTotales, disponibleReal, totalIngresos);
+
+      // Ordenar Movimientos
+      const criterio = document.getElementById('criterio-orden').value;
+      movimientosMes.sort((a, b) => {
+        if (criterio === 'prioridad') {
+          const obtenerPrioridad = (m) => {
+            if (m.tipo === 'ingreso') return 1;
+            if (m.esRecurrente) return 2;
+            if (m.medio === 'Diferido') return 3;
+            return 4;
+          };
+          return obtenerPrioridad(a) - obtenerPrioridad(b);
+        } else if (criterio === 'fecha-desc') {
+          return b.fecha.localeCompare(a.fecha);
+        } else if (criterio === 'fecha-asc') {
+          return a.fecha.localeCompare(b.fecha);
+        }
+      });
+
+      // Actualizar Tabla Movimientos
+      const tabla = document.getElementById('tabla-movimientos');
+      tabla.innerHTML = '';
+
+      if (movimientosMes.length === 0) {
+        tabla.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 italic">Sin movimientos en este periodo.</td></tr>`;
+      } else {
+        movimientosMes.forEach(m => {
+          const esIngreso = m.tipo === 'ingreso';
+          let badgeMedio = `<span class="px-2 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-full font-semibold">Ocasional</span>`;
+
+          if (m.medio === 'Diferido') {
+            badgeMedio = `<span class="px-2 py-0.5 text-[10px] bg-amber-100 text-amber-700 rounded-full font-semibold">${m.infoCuota || 'Tarjeta'}</span>`;
+          } else if (m.esRecurrente) {
+            badgeMedio = `<span class="px-2 py-0.5 text-[10px] bg-indigo-100 text-indigo-700 rounded-full font-semibold">Servicio / Fijo</span>`;
+          }
+
+          tabla.innerHTML += `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="py-3.5 px-4 text-xs font-medium">${m.fecha}</td>
+              <td class="py-3.5 px-4 font-medium text-slate-800">${m.detalle}</td>
+              <td class="py-3.5 px-4 text-xs">${m.categoria || '-'}</td>
+              <td class="py-3.5 px-4 text-xs">${esIngreso ? '-' : badgeMedio}</td>
+              <td class="py-3.5 px-4 text-right font-bold ${esIngreso ? 'text-emerald-600' : 'text-slate-800'}">
+                ${esIngreso ? '+' : '-'}$${formatearMoneda(parseFloat(m.monto))}
+              </td>
+              <td class="py-3.5 px-4 text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <button onclick="abrirEdicionMonto(${m.id})" class="text-slate-400 hover:text-indigo-600 transition" title="Editar Monto">
+                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                  </button>
+                  <button onclick="eliminarMovimiento(${m.id})" class="text-slate-300 hover:text-rose-600 transition" title="Eliminar">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+      }
+
+      // RENDERIZAR MÓDULO DE INVERSIONES
+      const contenedorInv = document.getElementById('contenedor-inversiones');
+      contenedorInv.innerHTML = '';
+
+      if (inversiones.length === 0) {
+        contenedorInv.innerHTML = `<div class="col-span-2 text-center py-6 text-slate-400 text-sm italic">No tienes billeteras virtuales ni plazos fijos registrados.</div>`;
+      } else {
+        inversiones.forEach(inv => {
+          const esBilletera = inv.tipo === 'billetera';
+          
+          contenedorInv.innerHTML += `
+            <div class="p-4 rounded-2xl border ${esBilletera ? 'bg-purple-50/50 border-purple-100' : 'bg-blue-50/50 border-blue-100'} space-y-3">
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider ${esBilletera ? 'text-purple-600' : 'text-blue-600'}">
+                    ${esBilletera ? 'Billetera Virtual' : `Plazo Fijo (${inv.dias} Días)`}
+                  </span>
+                  <h3 class="text-base font-bold text-slate-800">${inv.nombre}</h3>
+                </div>
+                <div class="text-right flex items-center gap-1">
+                  <span class="text-xs bg-white px-2 py-1 rounded-lg border font-bold text-slate-700">TNA: ${inv.tna}%</span>
+                  ${esBilletera ? `
+                    <button onclick="editarTNAInversion(${inv.id})" class="text-slate-400 hover:text-purple-600 p-1" title="Editar TNA diario">
+                      <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200/60 text-xs">
+                <div>
+                  <p class="text-slate-400">Capital Invertido</p>
+                  <p class="text-base font-extrabold text-slate-800">$${formatearMoneda(parseFloat(inv.monto))}</p>
+                </div>
+                <div>
+                  <p class="text-slate-400">${esBilletera ? 'Rendimiento Diario' : 'Interés al Vencimiento'}</p>
+                  <p class="text-base font-extrabold text-emerald-600">
+                    +$${formatearMoneda(esBilletera ? inv.rendimientoDiario : inv.rendimientoTotal)}
+                  </p>
+                </div>
+              </div>
+
+              ${esBilletera ? `
+                <div class="bg-white/80 p-2 rounded-xl text-[11px] text-slate-600 flex justify-between items-center">
+                  <span>Ganancia Estimada Acumulada:</span>
+                  <span class="font-bold text-purple-700">+$${formatearMoneda(inv.rendimientoAcumulado)}</span>
+                </div>
+              ` : ''}
+
+              <div class="flex justify-between items-center pt-2">
+                <div class="flex gap-1">
+                  <button onclick="ajustarCapitalInversion(${inv.id}, 'suma')" class="text-xs bg-white hover:bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border font-semibold flex items-center gap-1 shadow-sm">
+                    <i data-lucide="plus" class="w-3 h-3 text-emerald-600"></i> Depositar
+                  </button>
+                  <button onclick="ajustarCapitalInversion(${inv.id}, 'resta')" class="text-xs bg-white hover:bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border font-semibold flex items-center gap-1 shadow-sm">
+                    <i data-lucide="minus" class="w-3 h-3 text-rose-600"></i> Retirar
+                  </button>
+                </div>
+
+                <button onclick="eliminarInversion(${inv.id})" class="text-slate-300 hover:text-rose-600 transition" title="Eliminar Inversión">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      lucide.createIcons();
+    }
+
+    // Funciones Modales
+    function abrirModalGasto() { document.getElementById('modal-gasto').classList.remove('hidden'); document.getElementById('modal-gasto').classList.add('flex'); }
+    function abrirModalIngreso() { document.getElementById('modal-ingreso').classList.remove('hidden'); document.getElementById('modal-ingreso').classList.add('flex'); }
+    function abrirModalInversion() { document.getElementById('modal-inversion').classList.remove('hidden'); document.getElementById('modal-inversion').classList.add('flex'); }
+    function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
+
+    // GUARDAR GASTO
+    function guardarGasto(e) {
+      e.preventDefault();
+      const montoTotal = parseFloat(document.getElementById('gasto-monto').value);
+      const detalle = document.getElementById('gasto-detalle').value;
+      const categoria = document.getElementById('gasto-categoria').value;
+      const medio = document.getElementById('gasto-medio').value;
+      const esRecurrente = document.getElementById('gasto-es-recurrente').checked;
+      const mesActual = obtenerMesSeleccionado();
+
+      if (medio === 'Diferido') {
+        const numCuotas = parseInt(document.getElementById('gasto-cuotas').value);
+        const offsetMeses = parseInt(document.getElementById('gasto-inicio-cuota').value);
+        const montoPorCuota = montoTotal / numCuotas;
+        const fechaBase = new Date();
+
+        for (let i = 0; i < numCuotas; i++) {
+          const fechaCuota = new Date(fechaBase.getFullYear(), fechaBase.getMonth() + offsetMeses + i, 1);
+          const fechaStr = fechaCuota.toISOString().slice(0, 10);
+
+          movimientos.push({
+            id: Date.now() + i,
+            tipo: 'gasto',
+            monto: montoPorCuota,
+            detalle: numCuotas > 1 ? `${detalle} (${i + 1}/${numCuotas})` : detalle,
+            categoria: categoria,
+            medio: medio,
+            infoCuota: numCuotas > 1 ? `Cuota ${i + 1}/${numCuotas}` : 'Tarjeta',
+            fecha: fechaStr
+          });
+        }
+      } else if (esRecurrente) {
+        const nuevoServicio = {
+          id: Date.now(),
+          detalle: detalle,
+          categoria: categoria,
+          montoBase: montoTotal,
+          fechaInicio: mesActual
+        };
+        serviciosRecurrentes.push(nuevoServicio);
+      } else {
+        movimientos.push({
+          id: Date.now(),
+          tipo: 'gasto',
+          monto: montoTotal,
+          detalle: detalle,
+          categoria: categoria,
+          medio: 'Inmediato',
+          fecha: `${mesActual}-01`
+        });
+      }
+
+      actualizarInterfaz();
+      cerrarModal('modal-gasto');
+      document.getElementById('form-gasto').reset();
+      evaluarMedioPago();
+    }
+
+    // GUARDAR INGRESO
+    function guardarIngreso(e) {
+      e.preventDefault();
+      const mesActual = obtenerMesSeleccionado();
+      const nuevoIngreso = {
+        id: Date.now(),
+        tipo: 'ingreso',
+        monto: parseFloat(document.getElementById('ingreso-monto').value),
+        detalle: document.getElementById('ingreso-detalle').value,
+        categoria: 'Ingresos',
+        medio: 'Inmediato',
+        fecha: `${mesActual}-01`
+      };
+      movimientos.push(nuevoIngreso);
+      actualizarInterfaz();
+      cerrarModal('modal-ingreso');
+      document.getElementById('form-ingreso').reset();
+    }
+
+    // GUARDAR NUEVA INVERSIÓN
+    function guardarInversion(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('inv-nombre').value;
+      const tipo = document.getElementById('inv-tipo').value;
+      const monto = parseFloat(document.getElementById('inv-monto').value);
+      const tna = parseFloat(document.getElementById('inv-tna').value);
+      const dias = tipo === 'plazo_fijo' ? parseInt(document.getElementById('inv-dias').value) : 0;
+
+      inversiones.push({
+        id: Date.now(),
+        nombre: nombre,
+        tipo: tipo,
+        monto: monto,
+        tna: tna,
+        dias: dias,
+        fechaInicio: new Date().toISOString()
+      });
+
+      actualizarInterfaz();
+      cerrarModal('modal-inversion');
+      document.getElementById('form-inversion').reset();
+    }
+
+    // EDITAR TNA EN BILLETERAS VIRTUALES
+    function editarTNAInversion(id) {
+      const inv = inversiones.find(i => i.id === id);
+      if (!inv || inv.tipo !== 'billetera') return;
+
+      const nuevaTNAStr = prompt(`Ingresa la nueva TNA (%) para "${inv.nombre}":`, inv.tna);
+      const nuevaTNA = parseFloat(nuevaTNAStr);
+
+      if (!isNaN(nuevaTNA) && nuevaTNA >= 0) {
+        inv.tna = nuevaTNA;
+        actualizarInterfaz();
+      }
+    }
+
+    // DEPOSITAR O RETIRAR DINERO
+    function ajustarCapitalInversion(id, accion) {
+      const inv = inversiones.find(i => i.id === id);
+      if (!inv) return;
+
+      const mensaje = accion === 'suma' ? '¿Cuánto dinero deseas DEPOSITAR en esta inversión?' : '¿Cuánto dinero deseas RETIRAR de esta inversión?';
+      const valorStr = prompt(mensaje, '0');
+      const valor = parseFloat(valorStr);
+
+      if (!isNaN(valor) && valor > 0) {
+        if (accion === 'suma') {
+          inv.monto += valor;
+        } else {
+          inv.monto = Math.max(0, inv.monto - valor);
+        }
+        actualizarInterfaz();
+      }
+    }
+
+    function eliminarInversion(id) {
+      if (confirm('¿Deseas eliminar este registro de inversión?')) {
+        inversiones = inversiones.filter(i => i.id !== id);
+        actualizarInterfaz();
+      }
+    }
+
+    // EDITAR MONTO DE UN MOVIMIENTO
+    function abrirEdicionMonto(id) {
+      const mov = movimientos.find(m => m.id === id);
+      if (!mov) return;
+
+      document.getElementById('edit-id').value = mov.id;
+      document.getElementById('edit-detalle-lbl').textContent = `${mov.detalle} (${mov.fecha})`;
+      document.getElementById('edit-monto').value = mov.monto;
+
+      const avisoFuturo = document.getElementById('edit-aviso-futuro');
+      if (mov.esRecurrente) {
+        avisoFuturo.classList.remove('hidden');
+      } else {
+        avisoFuturo.classList.add('hidden');
+      }
+
+      document.getElementById('modal-editar').classList.remove('hidden');
+      document.getElementById('modal-editar').classList.add('flex');
+    }
+
+    function guardarEdicionMonto(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('edit-id').value);
+      const nuevoMonto = parseFloat(document.getElementById('edit-monto').value);
+
+      const mov = movimientos.find(m => m.id === id);
+      if (mov) {
+        mov.monto = nuevoMonto;
+
+        if (mov.esRecurrente && mov.servicioId) {
+          const fechaCorte = mov.fecha.slice(0, 7);
+          movimientos.forEach(m => {
+            if (m.servicioId === mov.servicioId && m.fecha.slice(0, 7) >= fechaCorte) {
+              m.monto = nuevoMonto;
+            }
+          });
+        }
+      }
+
+      actualizarInterfaz();
+      cerrarModal('modal-editar');
+    }
+
+    // ELIMINAR MOVIMIENTO
+    function eliminarMovimiento(id) {
+      const mov = movimientos.find(m => m.id === id);
+      if (!mov) return;
+
+      if (mov.esRecurrente && mov.servicioId) {
+        const cancelarFuturo = confirm(`"${mov.detalle}" es un servicio recurrente.\n\n- OPRIME "ACEPTAR" para cancelar la suscripción de este mes en adelante.\n- OPRIME "CANCELAR" para eliminar solo la entrada de este mes.`);
+        
+        const mesCorte = mov.fecha.slice(0, 7);
+        
+        if (cancelarFuturo) {
+          const servicio = serviciosRecurrentes.find(s => s.id === mov.servicioId);
+          if (servicio) servicio.fechaFin = mesCorte;
+
+          movimientos = movimientos.filter(m => !(m.servicioId === mov.servicioId && m.fecha.slice(0, 7) >= mesCorte));
+        } else {
+          movimientos = movimientos.filter(m => m.id !== id);
+        }
+      } else {
+        movimientos = movimientos.filter(m => m.id !== id);
+      }
+
+      actualizarInterfaz();
+    }
+  </script>
+</body>
+</html>
