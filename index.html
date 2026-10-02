@@ -67,7 +67,7 @@
         </div>
         <div class="mt-2">
           <p class="text-base sm:text-2xl font-black text-slate-900 tracking-tight" id="lbl-disponible">$0,00</p>
-          <p class="text-[9px] sm:text-[11px] font-medium text-slate-400 mt-0.5 truncate">Ingresos - Inmediatos</p>
+          <p class="text-[9px] sm:text-[11px] font-medium text-slate-400 mt-0.5 truncate">Ingresos - Gastos Pagados</p>
         </div>
       </div>
 
@@ -242,15 +242,15 @@
             <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Medio de Pago</label>
             <select id="gasto-medio" onchange="evaluarMedioPago()" class="w-full border border-slate-200 rounded-xl p-3 text-xs sm:text-sm bg-white outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="Inmediato">Efectivo / Débito (Inmediato)</option>
-              <option value="Diferido">Tarjeta de Crédito (Cuotas)</option>
+              <option value="Diferido">Tarjeta de Crédito (Cuotas / Débito)</option>
             </select>
           </div>
         </div>
 
         <div id="campo-recurrente" class="flex items-center gap-2 p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl">
-          <input type="checkbox" id="gasto-es-recurrente" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
+          <input type="checkbox" id="gasto-es-recurrente" onchange="evaluarMedioPago()" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
           <label for="gasto-es-recurrente" class="text-xs font-semibold text-indigo-900 cursor-pointer">
-            Gasto Recurrente / Servicio Fijo (Aparece todos los meses)
+            Gasto Recurrente / Suscripción Fija (Aparece todos los meses)
           </label>
         </div>
 
@@ -437,6 +437,7 @@
     ];
 
     let miGraficoTorta = null;
+    let tarjetasDesplegadas = false;
 
     const hoy = new Date();
     const anioActual = hoy.getFullYear();
@@ -479,16 +480,14 @@
 
     function evaluarMedioPago() {
       const medio = document.getElementById('gasto-medio').value;
+      const esRecurrente = document.getElementById('gasto-es-recurrente').checked;
       const campoCuotas = document.getElementById('campo-cuotas');
-      const campoRecurrente = document.getElementById('campo-recurrente');
 
-      if (medio === 'Diferido') {
+      // Si es con tarjeta pero NO es recurrente, muestra opciones de cuotas
+      if (medio === 'Diferido' && !esRecurrente) {
         campoCuotas.classList.remove('hidden');
-        campoRecurrente.classList.add('hidden');
-        document.getElementById('gasto-es-recurrente').checked = false;
       } else {
         campoCuotas.classList.add('hidden');
-        campoRecurrente.classList.remove('hidden');
       }
     }
 
@@ -523,9 +522,10 @@
               monto: servicio.montoBase,
               detalle: servicio.detalle,
               categoria: servicio.categoria,
-              medio: 'Inmediato',
+              medio: servicio.medio || 'Inmediato',
+              infoCuota: servicio.medio === 'Diferido' ? 'Suscripción Tarjeta' : '',
               esRecurrente: true,
-              pagado: false, // Impuesto o servicio nuevo arranca pendiente
+              pagado: false,
               fecha: `${mesSeleccionado}-01`,
               periodoCobro: mesSeleccionado
             });
@@ -634,6 +634,21 @@
       }
     }
 
+    function toggleEstadoPagoGrupoTarjetas(mesSeleccionado, nuevoEstado) {
+      movimientos.forEach(m => {
+        const pCobro = m.periodoCobro || m.fecha.slice(0, 7);
+        if (m.medio === 'Diferido' && pCobro === mesSeleccionado) {
+          m.pagado = nuevoEstado;
+        }
+      });
+      actualizarInterfaz();
+    }
+
+    function toggleDesplegarTarjetas() {
+      tarjetasDesplegadas = !tarjetasDesplegadas;
+      actualizarInterfaz(false);
+    }
+
     function actualizarInterfaz(guardar = true) {
       const mesSeleccionado = obtenerMesSeleccionado();
       asegurarServiciosEnMes(mesSeleccionado);
@@ -650,7 +665,7 @@
       });
 
       let totalIngresos = 0;
-      let gastosInmediatos = 0;
+      let totalGastosPagados = 0;
       let gastosDiferidos = 0;
       let categoriasTotales = {};
 
@@ -658,16 +673,19 @@
         if (m.tipo === 'ingreso') {
           totalIngresos += parseFloat(m.monto);
         } else {
-          if (m.medio === 'Inmediato') {
-            gastosInmediatos += parseFloat(m.monto);
-          } else {
+          if (m.pagado) {
+            totalGastosPagados += parseFloat(m.monto);
+          }
+
+          if (m.medio === 'Diferido') {
             gastosDiferidos += parseFloat(m.monto);
           }
+
           categoriasTotales[m.categoria] = (categoriasTotales[m.categoria] || 0) + parseFloat(m.monto);
         }
       });
 
-      const disponibleReal = totalIngresos - gastosInmediatos;
+      const disponibleReal = totalIngresos - totalGastosPagados;
 
       // CALCULAR INVERSIONES
       let capitalTotalInvertido = 0;
@@ -704,13 +722,16 @@
 
       // ORDENAMIENTO
       const criterio = document.getElementById('criterio-orden').value;
-      movimientosMes.sort((a, b) => {
+      
+      const movimientosNoTarjeta = movimientosMes.filter(m => m.medio !== 'Diferido');
+      const movimientosTarjeta = movimientosMes.filter(m => m.medio === 'Diferido');
+
+      movimientosNoTarjeta.sort((a, b) => {
         if (criterio === 'prioridad') {
           const obtenerPrioridad = (m) => {
             if (m.tipo === 'ingreso') return 1;
             if (m.esRecurrente) return 2;
-            if (m.medio === 'Diferido') return 3;
-            return 4;
+            return 3;
           };
           return obtenerPrioridad(a) - obtenerPrioridad(b);
         } else if (criterio === 'fecha-desc') {
@@ -727,15 +748,13 @@
       if (movimientosMes.length === 0) {
         tabla.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400 italic">Sin movimientos en este periodo.</td></tr>`;
       } else {
-        movimientosMes.forEach(m => {
+        // 1. RENDERIZAR MOVIMIENTOS HABITUALES
+        movimientosNoTarjeta.forEach(m => {
           const esIngreso = m.tipo === 'ingreso';
           const estaPagado = !!m.pagado;
 
           let badgeMedio = `<span class="px-2 py-0.5 text-[10px] bg-slate-100 text-slate-600 rounded-full font-semibold">Ocasional</span>`;
-
-          if (m.medio === 'Diferido') {
-            badgeMedio = `<span class="px-2 py-0.5 text-[10px] bg-amber-100 text-amber-700 rounded-full font-semibold">${m.infoCuota || 'Tarjeta'}</span>`;
-          } else if (m.esRecurrente) {
+          if (m.esRecurrente) {
             badgeMedio = `<span class="px-2 py-0.5 text-[10px] bg-indigo-100 text-indigo-700 rounded-full font-semibold">Servicio / Fijo</span>`;
           }
 
@@ -771,6 +790,77 @@
             </tr>
           `;
         });
+
+        // 2. RENDERIZAR GRUPO CONSOLIDADO DE TARJETAS DE CRÉDITO
+        if (movimientosTarjeta.length > 0) {
+          const totalTarjeta = movimientosTarjeta.reduce((sum, m) => sum + parseFloat(m.monto), 0);
+          const todasPagadas = movimientosTarjeta.every(m => m.pagado);
+
+          tabla.innerHTML += `
+            <tr class="bg-amber-50/70 border-y-2 border-amber-200/80 transition hover:bg-amber-100/60 font-semibold">
+              <td class="py-3.5 px-3 sm:px-4 text-center whitespace-nowrap">
+                <button onclick="toggleEstadoPagoGrupoTarjetas('${mesSeleccionado}', ${!todasPagadas})" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition ${todasPagadas ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200' : 'bg-amber-200/80 text-amber-900 border border-amber-300 hover:bg-amber-300'}">
+                  <input type="checkbox" ${todasPagadas ? 'checked' : ''} class="w-3.5 h-3.5 text-emerald-600 rounded cursor-pointer pointer-events-none">
+                  <span>${todasPagadas ? 'Pagado' : 'Pendiente'}</span>
+                </button>
+              </td>
+              <td class="py-3.5 px-3 sm:px-4 text-xs font-bold text-amber-900 whitespace-nowrap">Resumen Mes</td>
+              <td class="py-3.5 px-3 sm:px-4">
+                <button onclick="toggleDesplegarTarjetas()" class="flex items-center gap-2 text-amber-950 font-bold hover:text-indigo-700 transition group text-left">
+                  <i data-lucide="${tarjetasDesplegadas ? 'chevron-down' : 'chevron-right'}" class="w-4 h-4 text-amber-700 group-hover:text-indigo-600 transition"></i>
+                  <span>Total Tarjetas de Crédito (${movimientosTarjeta.length} ${movimientosTarjeta.length === 1 ? 'gasto' : 'gastos'})</span>
+                </button>
+              </td>
+              <td class="py-3.5 px-3 sm:px-4 text-xs text-amber-900 font-medium whitespace-nowrap">Varios</td>
+              <td class="py-3.5 px-3 sm:px-4 text-xs whitespace-nowrap">
+                <span class="px-2 py-0.5 text-[10px] bg-amber-200/90 text-amber-900 rounded-full font-bold">Tarjeta Crédito</span>
+              </td>
+              <td class="py-3.5 px-3 sm:px-4 text-right font-black ${todasPagadas ? 'text-slate-400 line-through' : 'text-amber-900'} text-sm whitespace-nowrap">
+                -$${formatearMoneda(totalTarjeta)}
+              </td>
+              <td class="py-3.5 px-3 sm:px-4 text-center text-xs text-amber-700 font-medium">
+                <button onclick="toggleDesplegarTarjetas()" class="text-xs bg-white/80 hover:bg-white text-amber-900 px-2 py-1 rounded-lg border border-amber-300 font-bold shadow-xs">
+                  ${tarjetasDesplegadas ? 'Ocultar' : 'Ver Detalle'}
+                </button>
+              </td>
+            </tr>
+          `;
+
+          // DETALLE DESPLEGADO (INCLUYE CUOTAS Y SUSCRIPCIONES EN TARJETA)
+          if (tarjetasDesplegadas) {
+            movimientosTarjeta.forEach(m => {
+              const estaPagado = !!m.pagado;
+              tabla.innerHTML += `
+                <tr class="bg-amber-50/20 hover:bg-amber-50/50 transition border-l-4 border-amber-400">
+                  <td class="py-2.5 px-3 sm:px-4 text-center whitespace-nowrap text-[10px] text-amber-800/60 font-medium italic">
+                    Incluido en Resumen
+                  </td>
+                  <td class="py-2.5 px-3 sm:px-4 text-xs text-slate-500 whitespace-nowrap">${m.fecha}</td>
+                  <td class="py-2.5 px-3 sm:px-4 text-xs font-medium ${estaPagado ? 'text-slate-400 line-through' : 'text-slate-700'} pl-6">
+                    ↳ ${m.detalle}
+                  </td>
+                  <td class="py-2.5 px-3 sm:px-4 text-xs text-slate-500 whitespace-nowrap">${m.categoria || '-'}</td>
+                  <td class="py-2.5 px-3 sm:px-4 text-xs whitespace-nowrap">
+                    <span class="px-1.5 py-0.5 text-[9px] bg-amber-100 text-amber-800 rounded font-semibold">${m.infoCuota || 'Tarjeta'}</span>
+                  </td>
+                  <td class="py-2.5 px-3 sm:px-4 text-right text-xs font-bold ${estaPagado ? 'text-slate-400' : 'text-slate-800'} whitespace-nowrap">
+                    -$${formatearMoneda(parseFloat(m.monto))}
+                  </td>
+                  <td class="py-2.5 px-3 sm:px-4 text-center whitespace-nowrap">
+                    <div class="flex items-center justify-center gap-2">
+                      <button onclick="abrirEdicionMonto(${m.id})" class="text-slate-400 hover:text-indigo-600 transition" title="Editar Monto">
+                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                      </button>
+                      <button onclick="eliminarMovimiento(${m.id})" class="text-slate-300 hover:text-rose-600 transition" title="Eliminar">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            });
+          }
+        }
       }
 
       // RENDERIZAR INVERSIONES
@@ -860,7 +950,19 @@
       const mesActual = obtenerMesSeleccionado();
       const fechaHoyReal = obtenerFechaHoyISO();
 
-      if (medio === 'Diferido') {
+      if (esRecurrente) {
+        // Suscripción Fija / Servicio Recurrente (Puede ser contado o tarjeta)
+        const nuevoServicio = {
+          id: Date.now(),
+          detalle: detalle,
+          categoria: categoria,
+          medio: medio,
+          montoBase: montoTotal,
+          fechaInicio: mesActual
+        };
+        serviciosRecurrentes.push(nuevoServicio);
+      } else if (medio === 'Diferido') {
+        // Compra ocasional en cuotas con tarjeta
         const numCuotas = parseInt(document.getElementById('gasto-cuotas').value);
         const offsetMeses = parseInt(document.getElementById('gasto-inicio-cuota').value);
         const montoPorCuota = montoTotal / numCuotas;
@@ -881,22 +983,13 @@
             categoria: categoria,
             medio: medio,
             infoCuota: numCuotas > 1 ? `Cuota ${i + 1}/${numCuotas}` : 'Tarjeta',
-            pagado: false, // Inicia pendiente por ser cuota de tarjeta
+            pagado: false,
             fecha: fechaHoyReal,
             periodoCobro: periodoCobroStr
           });
         }
-      } else if (esRecurrente) {
-        const nuevoServicio = {
-          id: Date.now(),
-          detalle: detalle,
-          categoria: categoria,
-          montoBase: montoTotal,
-          fechaInicio: mesActual
-        };
-        serviciosRecurrentes.push(nuevoServicio);
       } else {
-        // Gasto Ocasional (Contado / Débito)
+        // Gasto ocasional de contado
         movimientos.push({
           id: Date.now(),
           tipo: 'gasto',
@@ -904,7 +997,7 @@
           detalle: detalle,
           categoria: categoria,
           medio: 'Inmediato',
-          pagado: true, // <-- INICIA TILDADO / PAGADO AL SER DE CONTADO
+          pagado: true,
           fecha: fechaHoyReal,
           periodoCobro: mesActual
         });
